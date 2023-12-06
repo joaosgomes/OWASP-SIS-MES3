@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>CORS</title>
+	</head>
+	<body>
+		<script>
+			var host = window.location.host;
+			console.log(host);
+
+			fetch('http://localhost:8787/path/', {
+				method: 'POST',
+				headers: {
+					'Accept': 'application/json',
+					'Content-Type': 'application/json',
+				},
+			})
+				.then(response => {
+					if (!response.ok) {
+						console.error(response.status);
+					}
+
+					return response.json();
+				})
+				.then(json => console.dir(json))
+				.catch(err => console.error(err.message));
+
+			
+			fetch('http://localhost:8787/path/')
+				.then(response => {
+					if (!response.ok) {
+						console.error(`HTTP error: ${response.status}`);
+					}
+					return response.json();
+				})
+				.then(json => console.dir(json))
+				.catch(err => console.error(`Fetch problem: ${err.message}`));
+
+     /*
+
+			function reqListener() {
+				console.log(this.responseText);
+			}
+
+			const req = new XMLHttpRequest();
+			req.addEventListener('load', reqListener);
+			req.open('GET', 'http://localhost:8787/path/');
+			req.send();
+
+      */
+		</script>
+	</body>
+</html>
