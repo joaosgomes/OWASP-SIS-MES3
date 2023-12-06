@@ -10,7 +10,7 @@
 			var host = window.location.host;
 			console.log(host);
 
-			fetch('http://localhost:8787/path/', {
+			fetch('https://owasp-sis-mes3.joao-s-gomes.workers.dev/path/', {
 				method: 'POST',
 				headers: {
 					'Accept': 'application/json',
@@ -28,7 +28,7 @@
 				.catch(err => console.error(err.message));
 
 			
-			fetch('http://localhost:8787/path/')
+			fetch('https://owasp-sis-mes3.joao-s-gomes.workers.dev/path/')
 				.then(response => {
 					if (!response.ok) {
 						console.error(`HTTP error: ${response.status}`);
