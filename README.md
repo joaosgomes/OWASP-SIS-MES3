@@ -39,4 +39,6 @@ echo "# OWASP-SIS-MES3" >> README.md
   git remote add origin https://github.com/joaosgomes/OWASP-SIS-MES3.git
   git push -u origin main
 
+  npm i uuid
+
 ```

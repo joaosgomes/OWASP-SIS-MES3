@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>PAGE</title>
+	</head>
+	<body>
+		<h1 id="id">PAGE</h1>
+
+		<script>
+			var url_string = window.location.href;
+			var url = new URL(url_string);
+			var isAdmin = url.searchParams.get('isAdmin');
+			console.log(isAdmin);
+
+			if (isAdmin == true) {
+				const element = document.getElementById('id');
+				element.innerHTML = 'Admin Page';
+			} else {
+
+				const element = document.getElementById('id');
+				element.innerHTML = 'Not Admin Page';
+			}
+		</script>
+	</body>
+</html>

@@ -1,4 +1,10 @@
 import { Router } from 'itty-router';
+import { uuid } from '@cfworker/uuid';
+
+// generate a uuid (uses crypto.randomUUID())
+//const id = uuid();
+
+//console.log(id);
 
 // Create a new router
 const router = Router();
@@ -26,7 +32,30 @@ const defaultData = {
 			isAdmin: false
 		},
 	],
+	usersUUID: [
+		{
+			id: '00000000-0000-0000-0000-000000000001',
+			name: 'user1',
+			isAdmin: false
+		},
+		{
+			id: '00000000-0000-0000-0000-000000000002',
+			name: 'user2',
+			isAdmin: false
+		},
+		{
+			id: '00000000-0000-0000-0000-000000000003',
+			name: 'user3',
+			isAdmin: false
+		},
+		{
+			id: '00000000-0000-0000-0000-000000000004',
+			name: 'user4',
+			isAdmin: false
+		},
+	],
 };
+
 
 /*
 Index route, a simple Response
@@ -59,10 +88,68 @@ const getUsers = async (request, env, ctx) => {
 	}
 };
 
+const getUsersUUID = async (request, env, ctx) => {
+	try {
+		const users = await defaultData.usersUUID;
+
+		const returnData = JSON.stringify({ users: users, status: 200 }, null, 2);
+
+		return new Response(returnData);
+	} catch (error) {
+		const returnData = JSON.stringify({ message: error.message, status: 404 }, null, 2);
+
+		return new Response(returnData);
+	}
+};
+
+
+async function createUserUUID(request) {
+	try {
+		const requestData = await request.json();
+		const newUser = {
+			id: uuid(),
+			name: requestData.name,
+			isAdmin: requestData.isAdmin || false,
+		};
+
+		defaultData.usersUUID.push(newUser);
+
+		return new Response(JSON.stringify(newUser), {
+			headers: { 'Content-Type': 'application/json' },
+			status: 201,
+		});
+	} catch (error) {
+		console.error('Error in createUser:', error);
+		return new Response('Failed to create user', { status: 500 });
+	}
+}
+
 const getUser = async ({ params }) => {
 	try {
 		const userId = parseInt(params.id);
 		const user = defaultData.users.find(user => user.id === userId);
+
+		if (!user) {
+			throw new Error('User not found');
+		}
+
+		// Do something with the user data, e.g., send it in the response
+		return new Response(JSON.stringify(user), {
+			headers: { 'Content-Type': 'application/json' },
+		});
+	} catch (error) {
+		// Handle errors, e.g., send an error response
+		console.error(error);
+		return new Response('Failed to fetch user data', { status: 500 });
+	}
+};
+
+
+const getUserUUID = async ({ params }) => {
+	try {
+		console.log(params.uuid);
+		const userId = params.uuid;
+		const user = defaultData.usersUUID.find(user => user.id === userId);
 
 		if (!user) {
 			throw new Error('User not found');
@@ -132,11 +219,17 @@ async function updateUser(request) {
 }
 
 router.post('/users', createUser);
+router.post('/usersUUID', createUserUUID);
+
 router.put('/users/:id', updateUser);
 
 router.get('/users/:id', getUser);
+router.get('/usersUUID/:uuid', getUserUUID);
+
 
 router.get('/users', getUsers);
+router.get('/usersUUID', getUsersUUID);
+
 
 router.all('/path/', (request, env, ctx) => {
 	//({ params, request}) => {

@@ -8,6 +8,7 @@
 		"test": "vitest"
 	},
 	"dependencies": {
+		"@cfworker/uuid": "^1.12.4",
 		"itty-router": "^2.6.1"
 	},
 	"devDependencies": {
