@@ -1,83 +1,121 @@
 import { Router } from 'itty-router';
 import { uuid } from '@cfworker/uuid';
 
-// generate a uuid (uses crypto.randomUUID())
-//const id = uuid();
-
-//console.log(id);
-
-// Create a new router
-const router = Router();
-
-const defaultData = {
+//Local Database
+const db = {
 	users: [
 		{
 			id: 1,
 			name: 'user1',
-			isAdmin: false
+			isAdmin: true,
+			isActive: true,
 		},
 		{
 			id: 2,
 			name: 'user2',
-			isAdmin: false
+			isAdmin: false,
+			isActive: true,
 		},
 		{
 			id: 3,
 			name: 'user3',
-			isAdmin: false
+			isAdmin: false,
+			isActive: true,
 		},
 		{
 			id: 4,
 			name: 'user4',
-			isAdmin: false
+			isAdmin: false,
+			isActive: true,
 		},
 	],
 	usersUUID: [
 		{
 			id: '00000000-0000-0000-0000-000000000001',
 			name: 'user1',
-			isAdmin: false
+			isAdmin: true,
+			isActive: true,
 		},
 		{
 			id: '00000000-0000-0000-0000-000000000002',
 			name: 'user2',
-			isAdmin: false
+			isAdmin: false,
+			isActive: true,
 		},
 		{
 			id: '00000000-0000-0000-0000-000000000003',
 			name: 'user3',
-			isAdmin: false
+			isAdmin: false,
+			isActive: true,
 		},
 		{
 			id: '00000000-0000-0000-0000-000000000004',
 			name: 'user4',
-			isAdmin: false
+			isAdmin: false,
+			isActive: true,
 		},
+	],
+
+	routes: [
+		{
+			Method: 'GET',
+			Enpoint: '/users'
+		},
+		{
+			Method: 'GET',
+			Enpoint: '/usersUUID'
+		},
+		{
+			Method: 'GET',
+			Enpoint: '/users/:id'
+		},
+		{
+			Method: 'GET',
+			Enpoint: '/usersUUID/:uuid'
+		},
+		{
+			Method: 'POST',
+			Enpoint: '/users'
+		},
+		{
+			Method: 'POST',
+			Enpoint: '/usersUUID'
+		},
+		{
+			Method: 'PUT',
+			Enpoint: '/users/:id'
+		},
+		{
+			Method: 'PUT',
+			Enpoint: '/usersUUID/:id'
+		},
+		{
+			Method: 'DELETE',
+			Enpoint: '/users/:id',
+		},
+		{
+			Method: 'DELETE',
+			Enpoint: '/usersSecure/:id',
+		},
+		{
+			Method: 'ALL',
+			Enpoint: '/status',
+		}
 	],
 };
 
+// Create a Router
+const router = Router();
 
-/*
-Index route, a simple Response
-*/
-router.get('/', async request => {
-	let j = {
-		TimeStamp: new Date(),
-	};
+//Controllers
 
-	//const blob = new Blob();
-	const options = { status: 200, statusText: 'Status Text' };
-
-	const returnData = JSON.stringify(j, null, 2);
-	const response = new Response(returnData, options);
-
-	return response;
-});
-
+//getUsers
 const getUsers = async (request, env, ctx) => {
 	try {
-		const users = await defaultData.users;
+		//Go to db get all Active Users
+		const users = await db.users.filter(user => user.isActive);
 
+		//retuen all users
 		const returnData = JSON.stringify({ users: users, status: 200 }, null, 2);
 
 		return new Response(returnData);
@@ -88,9 +126,11 @@ const getUsers = async (request, env, ctx) => {
 	}
 };
 
+//getUsersUUID
 const getUsersUUID = async (request, env, ctx) => {
 	try {
-		const users = await defaultData.usersUUID;
+		//Go to db get all Active Users
+		const users = await db.usersUUID.filter(user => user.isActive);
 
 		const returnData = JSON.stringify({ users: users, status: 200 }, null, 2);
 
@@ -102,17 +142,90 @@ const getUsersUUID = async (request, env, ctx) => {
 	}
 };
 
+//getUser get specific User
+const getUser = async ({ params }) => {
+	try {
+		//get params Id
+		const userId = parseInt(params.id);
 
+		//Go to db Find User
+		const user = db.users.find(user => user.id === userId);
+
+		if (!user) {
+			return new Response(JSON.stringify({ message: 'User not found', status: 404 }));
+		}
+
+		// Do something with the user data, e.g., send it in the response
+		return new Response(JSON.stringify(user), { headers: { 'Content-Type': 'application/json' } });
+	} catch (error) {
+		// Error response
+		return new Response('Failed to fetch user data', { status: 500 });
+	}
+};
+
+//getUser get specific User UUID
+const getUserUUID = async ({ params }) => {
+	try {
+		//get params UUUID
+		const userUUID = params.uuid;
+
+		//Go to db Find User
+		const user = db.usersUUID.find(user => user.id === userUUID);
+
+		if (!user) {
+			return new Response(JSON.stringify({ message: 'User not found', status: 404 }));
+		}
+
+		//send it in the response
+		return new Response(JSON.stringify(user), { headers: { 'Content-Type': 'application/json' } });
+	} catch (error) {
+		//Error response
+		return new Response('Failed to fetch user data', { status: 500 });
+	}
+};
+
+//createUser {"name": "Jonh Doe", "isAdmin": true}
+async function createUser(request) {
+	try {
+		//get json
+		const requestData = await request.json();
+
+		//Crete New User
+		const newUser = {
+			id: db.users.length + 1,
+			name: requestData.name,
+			isAdmin: requestData.isAdmin || false,
+			isActive: true,
+		};
+
+		//Save in db
+		db.users.push(newUser);
+
+		return new Response(JSON.stringify(newUser), {
+			headers: { 'Content-Type': 'application/json' },
+			status: 201,
+		});
+	} catch (error) {
+		return new Response('Failed to create user', { status: 500 });
+	}
+}
+
+//createUserUUID {"name": "Jonh Doe", "isAdmin": true}
 async function createUserUUID(request) {
 	try {
+		//get json
 		const requestData = await request.json();
+
+		//Crete New User
 		const newUser = {
 			id: uuid(),
 			name: requestData.name,
 			isAdmin: requestData.isAdmin || false,
+			isActive: true,
 		};
 
-		defaultData.usersUUID.push(newUser);
+		//Save in db
+		db.usersUUID.push(newUser);
 
 		return new Response(JSON.stringify(newUser), {
 			headers: { 'Content-Type': 'application/json' },
@@ -123,83 +236,51 @@ async function createUserUUID(request) {
 		return new Response('Failed to create user', { status: 500 });
 	}
 }
-
-const getUser = async ({ params }) => {
-	try {
-		const userId = parseInt(params.id);
-		const user = defaultData.users.find(user => user.id === userId);
-
-		if (!user) {
-			throw new Error('User not found');
-		}
-
-		// Do something with the user data, e.g., send it in the response
-		return new Response(JSON.stringify(user), {
-			headers: { 'Content-Type': 'application/json' },
-		});
-	} catch (error) {
-		// Handle errors, e.g., send an error response
-		console.error(error);
-		return new Response('Failed to fetch user data', { status: 500 });
-	}
-};
-
-
-const getUserUUID = async ({ params }) => {
-	try {
-		console.log(params.uuid);
-		const userId = params.uuid;
-		const user = defaultData.usersUUID.find(user => user.id === userId);
-
-		if (!user) {
-			throw new Error('User not found');
-		}
-
-		// Do something with the user data, e.g., send it in the response
-		return new Response(JSON.stringify(user), {
-			headers: { 'Content-Type': 'application/json' },
-		});
-	} catch (error) {
-		// Handle errors, e.g., send an error response
-		console.error(error);
-		return new Response('Failed to fetch user data', { status: 500 });
-	}
-};
-
-async function createUser(request) {
-	try {
-		const requestData = await request.json();
-		const newUser = {
-			id: defaultData.users.length + 1,
-			name: requestData.name,
-			isAdmin: requestData.isAdmin || false,
-		};
-
-		defaultData.users.push(newUser);
-
-		return new Response(JSON.stringify(newUser), {
-			headers: { 'Content-Type': 'application/json' },
-			status: 201,
-		});
-	} catch (error) {
-		console.error('Error in createUser:', error);
-		return new Response('Failed to create user', { status: 500 });
-	}
-}
-
+//updateUser {"name": "Jonh Doe", "isAdmin": true}
 async function updateUser(request) {
 	try {
+		//Find User
 		const userId = parseInt(request.params.id);
-		const user = defaultData.users.find(user => user.id === userId);
-		console.log(user);
-		// If the user is not found, throw an error
+		const user = db.users.find(user => user.id === userId);
+
 		if (!user) {
-			return new Response('User not found');
+			return new Response(JSON.stringify({ message: 'User not found', status: 404 }));
 		}
 
 		// Parse and extract the JSON data from the request
 		const requestData = await request.json();
-		console.log(JSON.stringify(request.json()));
+
+		if (!requestData) {
+			return new Response('Invalid JSON data in the request');
+		}
+
+		// Update the user's data with the new values
+		user.name = requestData.name || user.name;
+		user.isAdmin = requestData.isAdmin || user.isAdmin;
+
+		// Send the updated user data in the response
+		return new Response(JSON.stringify(user), {
+			headers: { 'Content-Type': 'application/json' },
+		});
+	} catch (error) {
+		console.error('Error in updateUser:', error);
+		return new Response('Failed to update user', { status: 500 });
+	}
+}
+//updateUsersUUID {"name": "Jonh Doe", "isAdmin": true}
+async function updateUsersUUID(request) {
+	try {
+		//Find User
+		const useruuid = request.params.id;
+		const user = db.usersUUID.find(user => user.id === useruuid);
+
+		if (!user) {
+			return new Response(JSON.stringify({ message: 'User not found', status: 404 }));
+		}
+
+		// Parse and extract the JSON data from the request
+		const requestData = await request.json();
+
 		if (!requestData) {
 			return new Response('Invalid JSON data in the request');
 		}
@@ -218,21 +299,130 @@ async function updateUser(request) {
 	}
 }
 
+async function deleteUser(request) {
+	try {
+		//Find User
+		const user = db.users.find(user => user.id === parseInt(request.params.id));
+
+		// If the user is not found, throw an error
+		if (!user) {
+			return new Response(JSON.stringify({ message: 'User not found', status: 404 }));
+		}
+
+		//Delete User
+		const index = db.users.indexOf(user);
+		db.users.splice(index, 1);
+
+		return new Response(
+			JSON.stringify({ message: 'user Deleted with Success', user: user, status: 200 }),
+			{ headers: { 'Content-Type': 'application/json' } }
+		);
+	} catch (error) {
+		return new Response(
+			JSON.stringify({ message: 'Failed to delete user', error: error, status: 500 })
+		);
+	}
+}
+
+async function deleteUserSecure(request) {
+	const AUTH_HEADER_KEY = 'X-Custom-AUTH';
+	const AUTH_HEADER_VALUE = 'authkey';
+	const key = request.headers.get(AUTH_HEADER_KEY);
+
+	const [auth, userId] = key.split(';');
+
+	if (auth === AUTH_HEADER_VALUE) {
+		try {
+			//Find UserRequest
+			const userRequest = db.users.find(user => user.id === parseInt(userId));
+
+			//Check if the User that make the Request is Admin
+			if (!userRequest.isAdmin) {
+				return new Response(
+					JSON.stringify({
+						message: 'Sorry, you have supplied an key from a User that is Not Admin',
+						status: 403,
+					}),
+					{
+						status: 403,
+					}
+				);
+			}
+
+			//Find User
+			const user = db.users.find(user => user.id === parseInt(request.params.id));
+
+			// If the user is not found, throw an error
+			if (!user) {
+				return new Response(JSON.stringify({ message: 'User not found', status: 404 }));
+			}
+
+			//Update User
+			user.isActive = false;
+
+			//Success
+			return new Response(
+				JSON.stringify({ message: 'user Deleted with Success', user: user, status: 200 }),
+				{ headers: { 'Content-Type': 'application/json' } }
+			);
+		} catch (error) {
+			//Failure
+			return new Response(
+				JSON.stringify({ message: 'Failed to delete user', error: error, status: 500 })
+			);
+		}
+	}
+	// Incorrect key supplied. Reject the request.
+	return new Response(
+		JSON.stringify({ message: 'Sorry, you have supplied an invalid key.', status: 403 }),
+		{
+			status: 403,
+		}
+	);
+}
+
+//Routes
+/*
+Index route, a simple Response
+*/
+
+router.get('/', async request => {
+	let r = {
+		TimeStamp: new Date(),
+		status: 200,
+		message: 'Ok',
+		routes_: db.routes
+	};
+
+	const options = { status: 200, message: 'Ok' };
+
+	const returnData = JSON.stringify(r, null, 2);
+	const response = new Response(returnData, options);
+
+	return response;
+});
+
+router.get('/users', getUsers);
+
+router.get('/usersUUID', getUsersUUID);
+
+router.get('/users/:id', getUser);
+
+router.get('/usersUUID/:uuid', getUserUUID);
+
 router.post('/users', createUser);
+
 router.post('/usersUUID', createUserUUID);
 
 router.put('/users/:id', updateUser);
 
-router.get('/users/:id', getUser);
-router.get('/usersUUID/:uuid', getUserUUID);
+router.put('/usersUUID/:id', updateUsersUUID);
 
+router.delete('/users/:id', deleteUser);
 
-router.get('/users', getUsers);
-router.get('/usersUUID', getUsersUUID);
+router.delete('/usersSecure/:id', deleteUserSecure);
 
-
-router.all('/path/', (request, env, ctx) => {
-	//({ params, request}) => {
+router.all('/status', (request, env, ctx) => {
 	let j = {
 		TimeStamp: new Date(),
 		Name: ctx,
@@ -261,37 +451,7 @@ router.all('/path/', (request, env, ctx) => {
 	});
 });
 
-/*
-This shows a different HTTP method, a POST.
 
-Try send a POST request using curl or another tool.
-
-Try the below curl command to send JSON:
-
-$ curl -X POST <worker> -H "Content-Type: application/json" -d '{"abc": "def"}'
-*/
-router.post('/post', async request => {
-	// Create a base object with some fields.
-	let fields = {
-		asn: request.cf.asn,
-		colo: request.cf.colo,
-	};
-
-	// If the POST data is JSON then attach it to our response.
-	if (request.headers.get('Content-Type') === 'application/json') {
-		let json = await request.json();
-		Object.assign(fields, { json });
-	}
-
-	// Serialise the JSON to a string.
-	const returnData = JSON.stringify(fields, null, 2);
-
-	return new Response(returnData, {
-		headers: {
-			'Content-Type': 'application/json',
-		},
-	});
-});
 
 /*
 This is the last route we define, it will match anything that hasn't hit a route we've defined
