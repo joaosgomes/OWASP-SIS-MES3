@@ -9,6 +9,7 @@
 	},
 	"dependencies": {
 		"@cfworker/uuid": "^1.12.4",
+		"@tsndr/cloudflare-worker-jwt": "^2.3.2",
 		"itty-router": "^2.6.1"
 	},
 	"devDependencies": {

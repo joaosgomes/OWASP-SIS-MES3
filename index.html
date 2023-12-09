@@ -2,62 +2,131 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
+		<meta http-equiv="Content-Type" content="text/html; charset = UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>CORS</title>
+		<meta name="description" content="OWASP Broken Access Control" />
+		<meta name="author" content="João Da Silva Gomes" />
+		<meta name="robots" content="follow" />
+		<meta http-equiv="cache-control" content="no-cache" />
+		<meta name="category" content="" />
+		<meta name="coverage" content="Worldwide" />
+
+		<meta name="keywords" content="OWASP, Broken Access Control" />
+		<meta name="description" content="OWASP Broken Access Control" />
+		<meta name="subject" content="OWASP Broken Access Control" />
+		<meta name="copyright" content="João Da Silva Gomes" />
+		<meta name="language" content="EN" />
+		<meta name="robots" content="index,follow" />
+		<meta name="abstract" content="" />
+		<meta name="topic" content="" />
+		<meta name="summary" content="" />
+		<meta name="author" content="João Da Silva Gomes, joao.s.gomes@outlook.pt" />
+		<meta name="designer" content="" />
+		<meta name="copyright" content="" />
+		<meta name="reply-to" content="joao.s.gomes@outlook.pt" />
+		<meta name="owner" content="" />
+		<meta name="url" content="https://github.com/joaosgomes/OWASP-SIS-MES3" />
+		<meta name="identifier-URL" content="https://github.com/joaosgomes/OWASP-SIS-MES3" />
+		<meta name="category" content="" />
+		<meta name="coverage" content="Worldwide" />
+		<meta name="distribution" content="Global" />
+		<meta name="rating" content="General" />
+		<meta http-equiv="Expires" content="0" />
+		<meta http-equiv="Pragma" content="no-cache" />
+		<meta http-equiv="Cache-Control" content="no-cache" />
+
+		<meta name="og:title" content="OWASP Broken Access Control" />
+		<meta name="og:url" content="https://github.com/joaosgomes/OWASP-SIS-MES3" />
+		<meta name="og:site_name" content="OWASP Broken Access Control" />
+		<meta name="og:description" content="OWASP Broken Access Control" />
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta content="yes" name="apple-touch-fullscreen" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<meta name="format-detection" content="telephone=no" />
+		<meta name="viewport" content="width = 320, initial-scale = 2.3, user-scalable = no" />
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<meta name="format-detection" content="telephone=no" />
+		<meta name="viewport" content="width = 320, initial-scale = 2.3, user-scalable = no" />
+		<meta name="viewport" content="width = device-width" />
+		<meta name="viewport" content="initial-scale = 1.0" />
+		<meta name="viewport" content="initial-scale = 2.3, user-scalable = no" />
+		
+		<title>OWASP Broken Access Control</title>
 	</head>
 	<body>
+
 
 		<div>
 			<a href="./login?isAdmin=1">Admin (isAdmin=1)</a>
 			<a href="./login?isAdmin=0">Admin (isAdmin=0)</a>
-			<a href="#">.</a>
-			<a href="#">.</a>
-		  </div>
+			<a href="#" onclick="fetchWithoutCors();">fetchWithoutCors</a>
+			<a href="#" onclick="fetchWithCors();">fetchWithCors</a>
+		</div>
+
+		<pre id="id"></pre>
 
 		<script>
 			var host = window.location.host;
-			console.log(host);
+			//console.log(host);
 
-			fetch('https://owasp-sis-mes3.joao-s-gomes.workers.dev/path/', {
-				method: 'POST',
-				headers: {
-					'Accept': 'application/json',
-					'Content-Type': 'application/json',
-				},
-			})
-				.then(response => {
-					if (!response.ok) {
-						console.error(response.status);
-					}
+			function fetchWithoutCors() {
+				const element = document.getElementById('id');
+				element.innerHTML = '';
 
-					return response.json();
-				})
-				.then(json => console.dir(json))
-				.catch(err => console.error(err.message));
-
-			
-			fetch('https://owasp-sis-mes3.joao-s-gomes.workers.dev/path/')
-				.then(response => {
-					if (!response.ok) {
-						console.error(`HTTP error: ${response.status}`);
-					}
-					return response.json();
-				})
-				.then(json => console.dir(json))
-				.catch(err => console.error(`Fetch problem: ${err.message}`));
-
-     /*
-
-			function reqListener() {
-				console.log(this.responseText);
+				fetch('https://owasp-sis-mes3.joao-s-gomes.workers.dev/users')
+					.then(response => {
+						// Check if the response is ok (status code 200)
+						if (response.ok) {
+							// Convert the response to JSON format and return it
+							//return response.json();
+							const element = document.getElementById('id');
+							element.innerHTML = response.status;
+						} else {
+							// Throw an error with the status text
+							const element = document.getElementById('id');
+							element.innerHTML = response.status;
+							throw new Error(response.statusText);
+						}
+					})
+					.then(data => {
+						// Do something with the data
+						console.log(data);
+					})
+					.catch(error => {
+						// Handle the error
+						console.error(error);
+					});
 			}
 
-			const req = new XMLHttpRequest();
-			req.addEventListener('load', reqListener);
-			req.open('GET', 'http://localhost:8787/path/');
-			req.send();
+			function fetchWithCors() {
+				const element = document.getElementById('id');
+				element.innerHTML = '';
+				fetch('https://owasp-sis-mes3.joao-s-gomes.workers.dev/status/')
+					.then(response => {
+						// Check if the response is ok (status code 200)
+						if (response.ok) {
+							// Convert the response to JSON format and return it
+							//return response.json();
 
-      */
+							const element = document.getElementById('id');
+							element.innerHTML = response.status;
+						} else {
+							// Throw an error with the status text
+							throw new Error(response.statusText);
+						}
+					})
+					.then(data => {
+						// Do something with the data
+						console.log(data);
+					})
+					.catch(error => {
+						// Handle the error
+						console.error(error);
+					});
+			}
 		</script>
 	</body>
 </html>

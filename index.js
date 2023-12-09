@@ -1,5 +1,6 @@
 import { Router } from 'itty-router';
 import { uuid } from '@cfworker/uuid';
+import jwt from '@tsndr/cloudflare-worker-jwt';
 
 //Local Database
 const db = {
@@ -59,35 +60,35 @@ const db = {
 	routes: [
 		{
 			Method: 'GET',
-			Enpoint: '/users'
+			Enpoint: '/users',
 		},
 		{
 			Method: 'GET',
-			Enpoint: '/usersUUID'
+			Enpoint: '/usersUUID',
 		},
 		{
 			Method: 'GET',
-			Enpoint: '/users/:id'
+			Enpoint: '/users/:id',
 		},
 		{
 			Method: 'GET',
-			Enpoint: '/usersUUID/:uuid'
+			Enpoint: '/usersUUID/:uuid',
 		},
 		{
 			Method: 'POST',
-			Enpoint: '/users'
+			Enpoint: '/users',
 		},
 		{
 			Method: 'POST',
-			Enpoint: '/usersUUID'
+			Enpoint: '/usersUUID',
 		},
 		{
 			Method: 'PUT',
-			Enpoint: '/users/:id'
+			Enpoint: '/users/:id',
 		},
 		{
 			Method: 'PUT',
-			Enpoint: '/usersUUID/:id'
+			Enpoint: '/usersUUID/:id',
 		},
 		{
 			Method: 'DELETE',
@@ -100,7 +101,7 @@ const db = {
 		{
 			Method: 'ALL',
 			Enpoint: '/status',
-		}
+		},
 	],
 };
 
@@ -381,6 +382,43 @@ async function deleteUserSecure(request) {
 	);
 }
 
+async function login(request) {
+	let req_url = new URL(request.url);
+	let pw = req_url.searchParams.get('password');
+	let email = req_url.searchParams.get('email');
+
+	/*
+	const authorization = request.headers.get("Authorization");
+	if (!authorization) {
+	  return new Response(JSON.stringify({message: 'You need to login.', status: 401}), {
+		status: 401
+	  });
+	}
+	const [username, password] = authorization.split(" ");
+	*/
+
+	// Parse and extract the JSON data from the request
+	const requestData = await request.json();
+
+	const token = await jwt.sign(
+		{
+			password: requestData.password,
+			email: requestData.email,
+			exp: Math.floor(Date.now() / 1000) + 2 * (60 * 60), // Expires: Now + 2h
+		},
+		'secret'
+	);
+
+	return new Response(
+		JSON.stringify({
+			pw: requestData.password,
+			email: requestData.email,
+			token: token,
+			status: 200,
+		})
+	);
+}
+
 //Routes
 /*
 Index route, a simple Response
@@ -391,7 +429,7 @@ router.get('/', async request => {
 		TimeStamp: new Date(),
 		status: 200,
 		message: 'Ok',
-		routes_: db.routes
+		routes_: db.routes,
 	};
 
 	const options = { status: 200, message: 'Ok' };
@@ -422,6 +460,8 @@ router.delete('/users/:id', deleteUser);
 
 router.delete('/usersSecure/:id', deleteUserSecure);
 
+router.post('/login', login);
+
 router.all('/status', (request, env, ctx) => {
 	let j = {
 		TimeStamp: new Date(),
@@ -450,8 +490,6 @@ router.all('/status', (request, env, ctx) => {
 		status: 200,
 	});
 });
-
-
 
 /*
 This is the last route we define, it will match anything that hasn't hit a route we've defined

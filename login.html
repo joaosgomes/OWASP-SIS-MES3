@@ -2,11 +2,70 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
+		<meta http-equiv="Content-Type" content="text/html; charset = UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>PAGE</title>
+		<meta name="description" content="OWASP Broken Access Control" />
+		<meta name="author" content="João Da Silva Gomes" />
+		<meta name="robots" content="follow" />
+		<meta http-equiv="cache-control" content="no-cache" />
+		<meta name="category" content="" />
+		<meta name="coverage" content="Worldwide" />
+
+		<meta name="keywords" content="OWASP, Broken Access Control" />
+		<meta name="description" content="OWASP Broken Access Control" />
+		<meta name="subject" content="OWASP Broken Access Control" />
+		<meta name="copyright" content="João Da Silva Gomes" />
+		<meta name="language" content="EN" />
+		<meta name="robots" content="index,follow" />
+		<meta name="abstract" content="" />
+		<meta name="topic" content="" />
+		<meta name="summary" content="" />
+		<meta name="author" content="João Da Silva Gomes, joao.s.gomes@outlook.pt" />
+		<meta name="designer" content="" />
+		<meta name="copyright" content="" />
+		<meta name="reply-to" content="joao.s.gomes@outlook.pt" />
+		<meta name="owner" content="" />
+		<meta name="url" content="https://github.com/joaosgomes/OWASP-SIS-MES3" />
+		<meta name="identifier-URL" content="https://github.com/joaosgomes/OWASP-SIS-MES3" />
+		<meta name="category" content="" />
+		<meta name="coverage" content="Worldwide" />
+		<meta name="distribution" content="Global" />
+		<meta name="rating" content="General" />
+		<meta http-equiv="Expires" content="0" />
+		<meta http-equiv="Pragma" content="no-cache" />
+		<meta http-equiv="Cache-Control" content="no-cache" />
+
+		<meta name="og:title" content="OWASP Broken Access Control" />
+		<meta name="og:url" content="https://github.com/joaosgomes/OWASP-SIS-MES3" />
+		<meta name="og:site_name" content="OWASP Broken Access Control" />
+		<meta name="og:description" content="OWASP Broken Access Control" />
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta content="yes" name="apple-touch-fullscreen" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<meta name="format-detection" content="telephone=no" />
+		<meta name="viewport" content="width = 320, initial-scale = 2.3, user-scalable = no" />
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<meta name="format-detection" content="telephone=no" />
+		<meta name="viewport" content="width = 320, initial-scale = 2.3, user-scalable = no" />
+		<meta name="viewport" content="width = device-width" />
+		<meta name="viewport" content="initial-scale = 1.0" />
+		<meta name="viewport" content="initial-scale = 2.3, user-scalable = no" />
+
+		<title>OWASP Broken Access Control</title>
 	</head>
 	<body>
-		<h1 id="id">PAGE</h1>
+		<h1 id="id">OWASP Broken Access Control</h1>
+		<div id="svg"></div>
+		<p>
+			Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut
+			labore et dolore magna aliqua.
+		</p>
+		<div id="div1"></div>
+		<div id="div2"></div>
+		<div id="div3"></div>
 
 		<script>
 			var url_string = window.location.href;
@@ -17,10 +76,27 @@
 			if (isAdmin == true) {
 				const element = document.getElementById('id');
 				element.innerHTML = 'Admin Page';
-			} else {
+				const div1 = document.getElementById('div1');
+				const div2 = document.getElementById('div2');
+				const div3 = document.getElementById('div3');
 
+				div1.innerHTML =
+					'<a href="https://owasp-sis-mes3.joao-s-gomes.workers.dev/users">View Users</a>';
+				div2.innerHTML =
+					'<a href="https://owasp-sis-mes3.joao-s-gomes.workers.dev/users">Add Users</a>';
+				div3.innerHTML =
+					'<a href="https://owasp-sis-mes3.joao-s-gomes.workers.dev/users">Delete Users</a>';
+
+				const svg = document.getElementById('svg');
+				svg.innerHTML =
+					'<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 0c-3.371 2.866-5.484 3-9 3v11.535c0 4.603 3.203 5.804 9 9.465 5.797-3.661 9-4.862 9-9.465v-11.535c-3.516 0-5.629-.134-9-3zm0 1.292c2.942 2.31 5.12 2.655 8 2.701v10.542c0 3.891-2.638 4.943-8 8.284-5.375-3.35-8-4.414-8-8.284v-10.542c2.88-.046 5.058-.391 8-2.701zm5 7.739l-5.992 6.623-3.672-3.931.701-.683 3.008 3.184 5.227-5.878.728.685z"/></svg>';
+			} else {
 				const element = document.getElementById('id');
 				element.innerHTML = 'Not Admin Page';
+
+				const svg = document.getElementById('svg');
+				svg.innerHTML =
+					'<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 0c-3.371 2.866-5.484 3-9 3v11.535c0 4.603 3.203 5.804 9 9.465 5.797-3.661 9-4.862 9-9.465v-11.535c-3.516 0-5.629-.134-9-3zm0 1.292c2.942 2.31 5.12 2.655 8 2.701v10.542c0 3.891-2.638 4.943-8 8.284-5.375-3.35-8-4.414-8-8.284v-10.542c2.88-.046 5.058-.391 8-2.701zm0 10.001l3.182-3.182.707.707-3.182 3.182 3.182 3.182-.707.707-3.182-3.182-3.182 3.182-.707-.707 3.182-3.182-3.182-3.182.707-.707 3.182 3.182z"/></svg>';
 			}
 		</script>
 	</body>
