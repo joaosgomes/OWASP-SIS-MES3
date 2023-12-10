@@ -461,6 +461,18 @@ router.delete('/users/:id', deleteUser);
 router.delete('/usersSecure/:id', deleteUserSecure);
 
 router.post('/login', login);
+router.get('/statusnocors', (request, env, ctx) => {
+	let j = {
+		TimeStamp: new Date(),
+		Name: ctx,
+		Methods: request.method,
+		Request: request.cf,
+	};
+
+	const returnData = JSON.stringify(j, null, 2);
+
+	return new Response(returnData, {status: 200});
+});
 
 router.all('/status', (request, env, ctx) => {
 	let j = {
@@ -471,7 +483,7 @@ router.all('/status', (request, env, ctx) => {
 	};
 
 	const corsHeaders = {
-		'Access-Control-Allow-Origin': null, //'',
+		'Access-Control-Allow-Origin': 'https://joaosgomes.github.io/OWASP-SIS-MES3', ///null, //'',
 		'Access-Control-Allow-Methods': 'GET, OPTIONS',
 		'Access-Control-Allow-Headers': '*',
 		'Content-Type': 'application/json',
@@ -487,7 +499,7 @@ router.all('/status', (request, env, ctx) => {
 
 	return new Response(returnData, {
 		headers: corsHeaders,
-		status: 200,
+		status: 200
 	});
 });
 

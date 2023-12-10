@@ -53,12 +53,10 @@
 		<meta name="viewport" content="width = device-width" />
 		<meta name="viewport" content="initial-scale = 1.0" />
 		<meta name="viewport" content="initial-scale = 2.3, user-scalable = no" />
-		
+
 		<title>OWASP Broken Access Control</title>
 	</head>
 	<body>
-
-
 		<div>
 			<a href="./login?isAdmin=1">Admin (isAdmin=1)</a>
 			<a href="./login?isAdmin=0">Admin (isAdmin=0)</a>
@@ -76,55 +74,54 @@
 				const element = document.getElementById('id');
 				element.innerHTML = '';
 
-				fetch('https://owasp-sis-mes3.joao-s-gomes.workers.dev/users')
+				fetch('https://owasp-sis-mes3.joao-s-gomes.workers.dev/statusnocors')
 					.then(response => {
 						// Check if the response is ok (status code 200)
 						if (response.ok) {
 							// Convert the response to JSON format and return it
-							//return response.json();
 							const element = document.getElementById('id');
-							element.innerHTML = response.status;
+							element.innerHTML = response.ok;
 						} else {
-							// Throw an error with the status text
-							const element = document.getElementById('id');
-							element.innerHTML = response.status;
-							throw new Error(response.statusText);
+							throw new Error(response);
 						}
-					})
-					.then(data => {
-						// Do something with the data
-						console.log(data);
 					})
 					.catch(error => {
 						// Handle the error
-						console.error(error);
+						// Throw an error with the status text
+						const element = document.getElementById('id');
+						element.innerHTML = 'NOT OK';
+						console.info(error);
 					});
 			}
 
 			function fetchWithCors() {
 				const element = document.getElementById('id');
 				element.innerHTML = '';
-				fetch('https://owasp-sis-mes3.joao-s-gomes.workers.dev/status/')
+				fetch('https://owasp-sis-mes3.joao-s-gomes.workers.dev/status', {
+					method: 'GET', // *GET, POST, PUT, DELETE
+					cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+					credentials: 'same-origin', // include, *same-origin, omit
+					headers: {
+						'Content-Type': 'application/json', // 'Content-Type': 'application/x-www-form-urlencoded',
+					},
+					redirect: 'follow', // manual, *follow, error
+					referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+				})
 					.then(response => {
 						// Check if the response is ok (status code 200)
 						if (response.ok) {
-							// Convert the response to JSON format and return it
-							//return response.json();
-
 							const element = document.getElementById('id');
 							element.innerHTML = response.status;
 						} else {
 							// Throw an error with the status text
-							throw new Error(response.statusText);
+							throw new Error(response.status);
 						}
-					})
-					.then(data => {
-						// Do something with the data
-						console.log(data);
 					})
 					.catch(error => {
 						// Handle the error
-						console.error(error);
+						const element = document.getElementById('id');
+						element.innerHTML = 'NOT OK';
+						console.info(error);
 					});
 			}
 		</script>
