@@ -32,7 +32,7 @@ const db = {
 	],
 	usersUUID: [
 		{
-			id: '00000000-0000-0000-0000-000000000001',
+			id: 'f31dcf8d-1ff6-4033-a5bf-3835511c6341',
 			name: 'user1',
 			isAdmin: true,
 			isActive: true,
@@ -382,10 +382,55 @@ async function deleteUserSecure(request) {
 	);
 }
 
+
+async function deleteUserReferer(request) {
+	const Referer_HEADER_KEY = 'Referer';
+	const Refere_VALUE = 'admin';
+	const key = request.headers.get(Referer_HEADER_KEY);
+
+	const referer = key;
+
+	console.log(referer);
+
+	if (referer === Refere_VALUE) {
+		try {
+			//Find User
+			const user = db.users.find(user => user.id === parseInt(request.params.id));
+
+			// If the user is not found, throw an error
+			if (!user) {
+				return new Response(JSON.stringify({ message: 'User not found', status: 404 }));
+			}
+
+			//Delete User
+			const index = db.users.indexOf(user);
+			db.users.splice(index, 1);
+
+			//Success
+			return new Response(
+				JSON.stringify({ message: 'user Deleted with Success', user: user, status: 200 }),
+				{ headers: { 'Content-Type': 'application/json' } }
+			);
+		} catch (error) {
+			//Failure
+			return new Response(
+				JSON.stringify({ message: 'Failed to delete user', error: error, status: 500 })
+			);
+		}
+	}
+	// Incorrect key supplied. Reject the request.
+	return new Response(
+		JSON.stringify({ message: 'Sorry, you have supplied an invalid Referer key.', status: 403 }),
+		{
+			status: 403,
+		}
+	);
+}
+
 async function login(request) {
-	let req_url = new URL(request.url);
-	let pw = req_url.searchParams.get('password');
-	let email = req_url.searchParams.get('email');
+	//let req_url = new URL(request.url);
+	//let pw = req_url.searchParams.get('password');
+	//let email = req_url.searchParams.get('email');
 
 	/*
 	const authorization = request.headers.get("Authorization");
@@ -410,12 +455,37 @@ async function login(request) {
 	);
 
 	return new Response(
-		JSON.stringify({
-			pw: requestData.password,
-			email: requestData.email,
-			token: token,
-			status: 200,
-		})
+		JSON.stringify(
+			{
+				pw: requestData.password,
+				email: requestData.email,
+				token: token,
+				status: 200,
+			},
+			null,
+			2
+		),
+		{ headers: { 'Content-Type': 'application/json' } }
+	);
+}
+
+
+async function admin(request) {
+	let requestHeaders = JSON.stringify([...request.headers]);
+
+
+
+	return new Response(
+		JSON.stringify(
+			{
+				request: request,
+				headers: requestHeaders,
+				status: 200,
+			},
+			null,
+			2
+		),
+		{ headers: { 'Content-Type': 'application/json' } }
 	);
 }
 
@@ -460,7 +530,13 @@ router.delete('/users/:id', deleteUser);
 
 router.delete('/usersSecure/:id', deleteUserSecure);
 
+router.delete('/usersReferer/:id', deleteUserReferer);
+
+
 router.post('/login', login);
+
+router.get('/admin', admin);
+
 router.get('/statusnocors', (request, env, ctx) => {
 	let j = {
 		TimeStamp: new Date(),
@@ -471,7 +547,7 @@ router.get('/statusnocors', (request, env, ctx) => {
 
 	const returnData = JSON.stringify(j, null, 2);
 
-	return new Response(returnData, {status: 200});
+	return new Response(returnData, { status: 200 });
 });
 
 router.all('/status', (request, env, ctx) => {
@@ -483,7 +559,7 @@ router.all('/status', (request, env, ctx) => {
 	};
 
 	const corsHeaders = {
-		'Access-Control-Allow-Origin': 'https://joaosgomes.github.io/OWASP-SIS-MES3', ///null, //'',
+		'Access-Control-Allow-Origin': 'https://joaosgomes.github.io', ///null, //'',
 		'Access-Control-Allow-Methods': 'GET, OPTIONS',
 		'Access-Control-Allow-Headers': '*',
 		'Content-Type': 'application/json',
@@ -499,7 +575,7 @@ router.all('/status', (request, env, ctx) => {
 
 	return new Response(returnData, {
 		headers: corsHeaders,
-		status: 200
+		status: 200,
 	});
 });
 
