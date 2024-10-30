@@ -42,3 +42,10 @@ echo "# OWASP-SIS-MES3" >> README.md
   npm i uuid
 
 ```
+
+
+### Test
+
+Connect your Worker to a git repository for automatic builds and deployments
+
+ATTEMPT: OVERRIDE EXISTING CODE
